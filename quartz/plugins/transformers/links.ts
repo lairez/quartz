@@ -98,6 +98,13 @@ export const CrawlLinks: QuartzTransformerPlugin<Partial<Options>> = (userOpts) 
                   node.properties.target = "_blank"
                 }
 
+                // deal with intra-document block references starting with "#^"
+                // %5E = '^' in URL encoding
+                if (dest.startsWith("#%5E")) {
+                  const [_, anchor] = splitAnchor(decodeURI(dest))
+                  dest = node.properties.href = anchor
+                }
+
                 // don't process external links or intra-document anchors
                 const isInternal = !(isAbsoluteUrl(dest) || dest.startsWith("#"))
                 if (isInternal) {
